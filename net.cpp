@@ -1,4 +1,4 @@
-﻿#include "net.h"
+#include "net.h"
 #include<vector>
 #include<sstream>
 #include <functional>
@@ -42,7 +42,7 @@ Net::~Net(){
 }
 
 int Net::makeconnect(std::string ip){
-	ip += ":45451";
+	ip += ":45452";
 	sock = BIO_new_connect(ip.c_str());
 	if(sock == NULL){
 		std::cout << "bio error" << std::endl;

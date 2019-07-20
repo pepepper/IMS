@@ -1,4 +1,4 @@
-﻿#define SDL_MAIN_HANDLED
+#define SDL_MAIN_HANDLED
 #include <memory>
 #include "Graphic.h"
 #include "Game.h"
@@ -31,7 +31,7 @@ std::string strGetOption(const char *message){
 	std::cin >> temp;
 	return temp;
 }
-
+//todo:yourturn
 int main(int argc, char *argv[]){
 	std::string ip, pass, arg;
 	unsigned long long room;
@@ -43,16 +43,16 @@ int main(int argc, char *argv[]){
 	std::thread netthread;
 	//部屋番号指定
 	try{
-		mode = intGetOption("モードを選択してください\n0:オフラインで交互にプレイする 1:オンラインでプレイする場合 :");
+		mode = intGetOption("モードを選択してください\n0:オフラインでプレイする 1:オンラインでプレイする場合 :");
 		if(mode != 0 && mode != 1)throw std::invalid_argument("");
 		else if(mode == 0){//offline
 			if(intGetOption("盤面サイズを指定しますか?\n0:指定しない 1:指定する :") == 0) game.reset(new Game());
 			else{
 				std::string sx, sy;
 				int x, y;
-				x = intGetOption("8以下で縦のサイズを入力してください(盤面は入力された数値の倍のサイズになります):");
-				y = intGetOption("8以下で横のサイズを入力してください(盤面は入力された数値の倍のサイズになります):");
-				if(x > 8 || y > 8)throw std::invalid_argument("");
+				x = intGetOption("100以下で縦のサイズを入力してください:");
+				y = intGetOption("100以下で横のサイズを入力してください:");
+				if(x > 100 || y > 100)throw std::invalid_argument("");
 				game.reset(new Game(x, y));
 			}
 		} else if(mode == 1){//online
@@ -76,17 +76,17 @@ int main(int argc, char *argv[]){
 				} else{
 					std::string sx, sy;
 					int x, y;
-					x = intGetOption("8以下で縦のサイズを入力してください(盤面は入力された数値の倍のサイズになります):");
-					y = intGetOption("8以下で横のサイズを入力してください(盤面は入力された数値の倍のサイズになります):");
-					if(x > 8 || y > 8)throw std::invalid_argument("");
+					x = intGetOption("100以下で縦のサイズを入力してください:");
+					y = intGetOption("100以下で横のサイズを入力してください:");
+					if(x > 100 || y > 100)throw std::invalid_argument("");
 					game.reset(new Game(x, y));
 				}
 				std::cout << "パスワードを設定しますか?" << std::endl << "0:設定しない 1:設定する :";
 				std::cin >> arg;
 				if(!arg.compare("1")){
 					pass = strGetOption("パスワードを入力してください:");
-					room = net->makeroom(game->board->boardx / 2, game->board->boardy / 2, pass);
-				} else 	room = net->makeroom(game->board->boardx / 2, game->board->boardy / 2);
+					room = net->makeroom(game->board->boardx  game->board->boardy, pass);
+				} else 	room = net->makeroom(game->board->boardx , game->board->boardy);
 				std::cout << "部屋番号:" << std::hex << room << std::dec << std::endl;
 			} else if(netmode == 1){//guest
 				netmode = 1;
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]){
 				if (room == 0) {
 					netmode = -1;
 					game.reset(new Game());
-					net->makeroom(game->board->boardx / 2, game->board->boardy / 2);
+					net->makeroom(game->board->boardx , game->board->boardy );
 				}
 				else if (room != -1) {
 					netmode = 1;
