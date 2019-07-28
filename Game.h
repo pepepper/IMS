@@ -4,11 +4,13 @@ class Game{
 	public:
 	Game();
 	Game(int x, int y);
+	Game(int x, int y, std::vector<int> vmines);
 	~Game();
-	bool put(int x, int y);
-	bool put(int x, int y, int freeput);
-	void canPass();
+	bool open(int x, int y);
+	void openall();
 	Boards *board;
 	bool full = false;
-	int howturn, b, w, turn;
+	int howturn,  turn;
+	long long joined;
+	std::vector<int> vmines;
 };

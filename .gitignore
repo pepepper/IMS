@@ -12,9 +12,9 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 .vscode
-othello
-SDL2-2.0.8
-SDL2_net-2.0.1
+ims
+SDL2-2.0.9
+
 *.exe
 *.dll
 *.vcxproj.*
@@ -22,7 +22,5 @@ SDL2_net-2.0.1
 .vs/
 x64/
 # End of https://www.gitignore.io/api/cmake
-/Graphic.cpp.bak
-/Graphic.h.bak
-/main.cpp.bak
-/net.cpp.bak
+/Debug
+/SDL2_ttf-2.0.15

@@ -65,13 +65,13 @@ void Net::closing(){
 	closed = 1;
 }
 
-std::tuple<int, int> Net::login(long long room){
+std::tuple<int, int, std::vector<int>> Net::login(long long room){
 	std::string request = "LOGIN " + std::to_string(room);
 	std::string reply;
 	send_with_retry(request);
-	if(closed)return std::make_tuple<int, int>(-1, -1);
+	if(closed)return std::make_tuple<int, int, std::vector<int>>(-1, -1,std::vector<int>());
 	read_with_retry(reply);
-	if(closed)return std::make_tuple<int, int>(-1, -1);
+	if(closed)return std::make_tuple<int, int, std::vector<int>>(-1, -1, std::vector<int>());
 
 	std::stringstream stream(reply);
 	std::string temp;
@@ -82,19 +82,25 @@ std::tuple<int, int> Net::login(long long room){
 		}
 	}
 	if(replys[0].find("SUCCESS") != std::string::npos){
-		return std::make_tuple<int, int>(std::stoi(replys[1]), std::stoi(replys[2]));
+		int first = std::stoi(replys[1]),second= std::stoi(replys[2]);
+		replys.erase(replys.begin(), replys.begin() + 3);
+		std::vector<int> mines;
+		for (std::string &s : replys) {
+			mines.emplace_back(std::stoi(s));
+		}
+		return std::make_tuple(first, second,mines);
 	}
 	closed = 1;
-	return std::make_tuple<int, int>(-1, -1);
+	return std::make_tuple<int, int, std::vector<int>>(-1, -1, std::vector<int>());
 }
 
-std::tuple<int, int> Net::login(long long room, std::string pass){
+std::tuple<int, int, std::vector<int>> Net::login(long long room, std::string pass){
 	std::string request = "LOGIN " + std::to_string(room) + " PASSWORD " + pass;
 	std::string reply;
 	send_with_retry(request);
-	if(closed)return std::make_tuple<int, int>(-1, -1);
+	if(closed)return std::make_tuple<int, int, std::vector<int>>(-1, -1, std::vector<int>());
 	read_with_retry(reply);
-	if(closed)return std::make_tuple<int, int>(-1, -1);
+	if(closed)return std::make_tuple<int, int, std::vector<int>>(-1, -1, std::vector<int>());
 
 	std::stringstream stream(reply);
 	std::string temp;
@@ -105,14 +111,21 @@ std::tuple<int, int> Net::login(long long room, std::string pass){
 		}
 	}
 	if(replys[0].find("SUCCESS") != std::string::npos){
-		return std::make_tuple<int, int>(std::stoi(replys[1]), std::stoi(replys[2]));
+		int first = std::stoi(replys[1]), second = std::stoi(replys[2]);
+		replys.erase(replys.begin(), replys.begin() + 3);
+		std::vector<int> mines;
+		for (std::string &s : replys) {
+			mines.emplace_back(std::stoi(s));
+		}
+		return std::make_tuple(first, second, mines);
 	}
 	closed = 1;
-	return std::make_tuple<int, int>(-1, -1);
+	return std::make_tuple<int, int, std::vector<int>>(-1, -1, std::vector<int>());
 }
 
-long long Net::makeroom(int x, int y){
+long long Net::makeroom(int x, int y,std::vector<int> mines){
 	std::string request = "ROOM " + std::to_string(x) + " " + std::to_string(y);
+	for(int i:mines)request+=" "+std::to_string(i);
 	std::string reply;
 	send_with_retry(request);
 	if(closed)return -1;
@@ -134,8 +147,10 @@ long long Net::makeroom(int x, int y){
 	return -1;
 }
 
-long long Net::makeroom(int x, int y, std::string pass){
-	std::string request = "ROOM " + std::to_string(x) + " " + std::to_string(y) + " PASSWORD " + pass;
+long long Net::makeroom(int x, int y,std::vector<int> mines, std::string pass){
+	std::string request = "ROOM " + std::to_string(x) + " " + std::to_string(y);
+	for(int i:mines)request+=" "+std::to_string(i);
+	request+= " PASSWORD " + pass;
 	std::string reply;
 	send_with_retry(request);
 	if(closed)return -1;
@@ -157,14 +172,7 @@ long long Net::makeroom(int x, int y, std::string pass){
 }
 
 int Net::put(int x, int y){
-	std::string request = "PUT " + std::to_string(x) + " " + std::to_string(y);
-	send_with_retry(request);
-	if(closed)return -1;
-	return 0;
-}
-
-int Net::freeput(int x, int y){
-	std::string request = "FREEPUT " + std::to_string(x) + " " + std::to_string(y);
+	std::string request = "OPEN " + std::to_string(x) + " " + std::to_string(y);
 	send_with_retry(request);
 	if(closed)return -1;
 	return 0;
@@ -212,8 +220,7 @@ long long Net::automatch() {
 	}
 	if (replys[0].find("HOST") != std::string::npos) {
 		return 0;
-	}
-	else if (replys[0].find("GUEST") != std::string::npos) return std::stoll(replys[1]);
+	} else if (replys[0].find("GUEST") != std::string::npos) return std::stoll(replys[1]);
 	closed = 1;
 	return -1;
 }
