@@ -171,6 +171,31 @@ long long Net::makeroom(int x, int y,std::vector<int> mines, std::string pass){
 	return -1;
 }
 
+long long Net::freeroom(int x, int y,std::vector<int> mines){
+	std::string request = "FREEROOM " + std::to_string(x) + " " + std::to_string(y);
+	for(int i:mines)request+=" "+std::to_string(i);
+	std::string reply;
+	send_with_retry(request);
+	if(closed)return -1;
+	read_with_retry(reply);
+	if(closed)return -1;
+
+	std::stringstream stream(reply);
+	std::string temp;
+	std::vector<std::string> replys;
+	while(std::getline(stream, temp, ' ')){
+		if(!temp.empty()){
+			replys.push_back(temp);
+		}
+	}
+	if(replys[0].find("SUCCESS") != std::string::npos){
+		return std::stoll(replys[1]);
+	}
+	closed = 1;
+	return -1;
+}
+
+
 int Net::put(int x, int y){
 	std::string request = "OPEN " + std::to_string(x) + " " + std::to_string(y);
 	send_with_retry(request);
@@ -218,9 +243,5 @@ long long Net::automatch() {
 			replys.push_back(temp);
 		}
 	}
-	if (replys[0].find("HOST") != std::string::npos) {
-		return 0;
-	} else if (replys[0].find("GUEST") != std::string::npos) return std::stoll(replys[1]);
-	closed = 1;
-	return -1;
+	return std::stoll(replys[1]);
 }

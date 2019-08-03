@@ -31,6 +31,18 @@ Game::Game(int x, int y){
 	howturn = 0;
 }
 
+Game::Game(int x, int y,int numMines){
+	std::random_device seed_gen;
+	std::mt19937 engine(seed_gen());
+	std::uniform_int_distribution<int> minex(0, x-1);
+	std::uniform_int_distribution<int> miney(0, y-1);
+	std::vector<int> vmines;
+	for(int i=0;i<numMines;i++)vmines.emplace_back((minex(engine)<<16)+miney(engine));
+	board = new Boards(x, y,vmines);
+	turn = 0;
+	howturn = 0;
+}
+
 Game::Game(int x, int y,std::vector<int> vmines){
 	board = new Boards(x, y,vmines);
 	turn = 0;

@@ -170,6 +170,7 @@
     <ClCompile Include="Boards.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphic.cpp" />
+    <ClCompile Include="ims.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="net.cpp" />
   </ItemGroup>
@@ -179,6 +180,7 @@
     </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="Graphic.h" />
+    <ClInclude Include="ims.h" />
     <ClInclude Include="net.h" />
   </ItemGroup>
   <ItemGroup>

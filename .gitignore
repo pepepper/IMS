@@ -24,3 +24,11 @@ x64/
 # End of https://www.gitignore.io/api/cmake
 /Debug
 /SDL2_ttf-2.0.15
+/Game.cpp.bak
+/bakuhatsu.bmp
+/Game.h.bak
+/Graphic.cpp.bak
+/Graphic.h.bak
+/main.cpp.bak
+/net.cpp.bak
+/net.h.bak

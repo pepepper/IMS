@@ -4,7 +4,7 @@
 
 Graphic::Graphic() {
 	SDL_Surface *temp;
-	SDL_CreateWindowAndRenderer(480, 480, NULL, &window, &renderer);
+	SDL_CreateWindowAndRenderer(480, 512, NULL, &window, &renderer);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	temp = SDL_LoadBMP("./icon.bmp");
 	SDL_SetWindowIcon(window, temp);
@@ -19,6 +19,10 @@ Graphic::Graphic() {
 	bomb = SDL_CreateTextureFromSurface(renderer, temp);
 	SDL_FreeSurface(temp);
 
+	temp = SDL_LoadBMP("./reset.bmp");
+	reset = SDL_CreateTextureFromSurface(renderer, temp);
+	SDL_FreeSurface(temp);
+
 	TTF_Init();
 	font = TTF_OpenFont("Koruri-Regular.ttf", 16);
 }
@@ -30,8 +34,10 @@ Graphic::~Graphic() {
 		font = 0;
 	}
 	TTF_Quit();
+	if (reset)SDL_DestroyTexture(reset);
+	if (bomb)SDL_DestroyTexture(bomb);
 	if (board)SDL_DestroyTexture(board);
-	if (board)SDL_DestroyTexture(tex);
+	if (tex)SDL_DestroyTexture(tex);
 	if (dialog)SDL_DestroyTexture(dialog);
 	if (renderer)SDL_DestroyRenderer(renderer);
 	if (window)SDL_DestroyWindow(window);
@@ -53,10 +59,14 @@ void Graphic::StartGame(int x, int y) {
 	}
 	SDL_SetRenderTarget(renderer, NULL);
 	rect.x = (480 - (x * 16)) / 2;
-	rect.y = (480 - (y * 16)) / 2;
+	rect.y = (480 - (y * 16)) / 2 + 32;
 	rect.w = x * 16;
 	rect.h = y * 16;
 	SDL_RenderCopy(renderer, tex, NULL, &rect);
+}
+
+void Graphic::resetgame() {
+	if (tex)SDL_DestroyTexture(tex);
 }
 
 void Graphic::Put(std::vector<std::vector<int>> &delta) {//[n][0] white/black [n][1] x [n][2] y
@@ -87,6 +97,7 @@ void Graphic::mine() {
 
 void Graphic::update() {
 	SDL_RenderFillRect(renderer, NULL);
+	SDL_RenderCopy(renderer, reset, NULL, &resetrect);
 	SDL_RenderCopy(renderer, tex, NULL, &rect);
 	SDL_RenderPresent(renderer);
 }
@@ -101,6 +112,10 @@ void Graphic::netchangeturn(long long you, int turn) {
 
 void Graphic::end() {
 	SDL_SetWindowTitle(window, u8"Internet Mine Sweeper:ゲーム終了");
+}
+
+void Graphic::fillscreen(){
+	SDL_RenderFillRect(renderer, NULL);
 }
 
 void Graphic::Render_UTF8_Text(std::vector<std::string> text) {
@@ -162,6 +177,84 @@ void Graphic::ClearGameDialogBox(int howturn) {
 void Graphic::ConnectionclosedDialogBox() {
 	Render_UTF8_Text({ u8"通知", u8"接続が切断されました", u8"何かキーを押してください" });
 	dialogmode = 1;
+	return;
+}
+
+void Graphic::modeselect() {
+	Render_UTF8_Text({ u8"モードを選択してください", u8"0キー:オフラインでプレイする 1キー:オンラインでプレイする" });
+	settingdialog = 1;
+	return;
+}
+
+void Graphic::netmodeselect() {
+	Render_UTF8_Text({ u8"モードを選択してください", u8"0キー:ホストとして部屋を立てる 1キー:ゲストとして部屋に入る 2:オートマッチング" });
+	settingdialog = 2;
+	return;
+}
+
+void Graphic::boardselect() {
+	Render_UTF8_Text({ u8"盤面サイズを指定しますか?", u8"0キー:指定しない 1キー:指定する" });
+	settingdialog = 3;
+	return;
+}
+
+void Graphic::boardsize(std::string input) {
+	Render_UTF8_Text({ u8"20以下で縦のサイズと横のサイズを空白で区切って入力してください", u8"Enterキーで確定", input });
+	settingdialog = 4;
+	SDL_StartTextInput();
+	return;
+}
+
+void Graphic::mineselect() {
+	Render_UTF8_Text({ u8"地雷の数を指定しますか?", u8"0キー:指定しない 1キー:指定する" });
+	settingdialog = 5;
+	return;
+}
+
+void Graphic::minesize(int max, std::string input) {
+	std::string str = std::to_string(max) + u8"以下で地雷の数を入力してください";
+	Render_UTF8_Text({ str, u8"Enterキーで確定", input });
+	settingdialog = 6;
+	SDL_StartTextInput();
+	return;
+}
+
+void Graphic::serverselect(std::string input) {
+	Render_UTF8_Text({ u8"サーバーのIPアドレスまたはドメインを入力してください", u8"Enterキーで確定", input });
+	settingdialog = 7;
+	SDL_StartTextInput();
+	return;
+}
+
+void Graphic::roomselect(std::string input) {
+	Render_UTF8_Text({ u8"部屋番号を入力してください", u8"Enterキーで確定", input });
+	settingdialog = 8;
+	SDL_StartTextInput();
+	return;
+}
+
+void Graphic::passwordselect() {
+	Render_UTF8_Text({ u8"パスワードは必要ですか", u8"0キー:必要 1キー:不要" });
+	settingdialog = 9;
+	return;
+}
+
+void Graphic::password(std::string input) {
+	Render_UTF8_Text({ u8"パスワードを入力してください", u8"Enterキーで確定", input });
+	settingdialog = 10;
+	SDL_StartTextInput();
+	return;
+}
+
+void Graphic::autoroomselect(){
+	Render_UTF8_Text({ u8"自動参加しますか?(接続可能なランダムな部屋に参加します)", u8"0キー:する 1キー:しない" });
+	settingdialog = 11;
+	return;
+}
+
+void Graphic::automatchselect() {
+	Render_UTF8_Text({ u8"自動参加を有効にしますか(ゲストがランダムで参加します)", u8"0キー:無効 1キー:有効" });
+	settingdialog = 11;
 	return;
 }
 

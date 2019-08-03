@@ -4,6 +4,7 @@ class Game{
 	public:
 	Game();
 	Game(int x, int y);
+	Game(int x, int y,int nummine);
 	Game(int x, int y, std::vector<int> vmines);
 	~Game();
 	bool open(int x, int y);
