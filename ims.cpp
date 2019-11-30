@@ -315,19 +315,19 @@ void ims::setting() {
 						room = net->freeroom(game->board->boardx, game->board->boardy, game->vmines);
 						break;
 					}
-				} else if (graphic->settingdialog == 12) {
-					graphic->automatchselect();
-					if (e.type == SDL_KEYUP) {
-						if (e.key.keysym.sym == SDLK_0 || e.key.keysym.sym == SDLK_KP_0) {
-							graphic->roomselect(strroom);
-							break;
-						} else if (e.key.keysym.sym == SDLK_1 || e.key.keysym.sym == SDLK_KP_1) {
-							room = net->automatch();
-							std::tuple<int, int, std::vector<int>> size = net->login(room);
-							game.reset(new Game(std::get<0>(size), std::get<1>(size), std::get<2>(size)));
-							graphic->settingdialog = 0;
-							break;
-						}
+				} 
+			}else if (graphic->settingdialog == 12) {
+				graphic->automatchselect();
+				if (e.type == SDL_KEYUP) {
+					if (e.key.keysym.sym == SDLK_0 || e.key.keysym.sym == SDLK_KP_0) {
+						graphic->roomselect(strroom);
+						break;
+					} else if (e.key.keysym.sym == SDLK_1 || e.key.keysym.sym == SDLK_KP_1) {
+						room = net->automatch();
+						std::tuple<int, int, std::vector<int>> size = net->login(room);
+						game.reset(new Game(std::get<0>(size), std::get<1>(size), std::get<2>(size)));
+						graphic->settingdialog = 0;
+						break;
 					}
 				}
 			}
